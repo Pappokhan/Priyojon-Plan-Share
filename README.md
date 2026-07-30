@@ -1,73 +1,190 @@
-# প্রিয়জন প্ল্যান (Priyojon Plan)
+# Priyojon Plan
 
-আপনার প্রিয় মানুষের জন্য পরিকল্পনা তৈরি করুন এবং একটি লিংকের মাধ্যমে শেয়ার করুন — Flask দিয়ে তৈরি।
+Create special plans for your loved ones and share them through a unique link - built with Flask.
 
-## চালানোর নিয়ম (How to run)
+## How to Run
 
-1. Python 3.9+ ইনস্টল থাকতে হবে।
-2. একটি ভার্চুয়াল এনভায়রনমেন্ট তৈরি করুন (ঐচ্ছিক কিন্তু ভালো অভ্যাস):
+1. Make sure Python 3.10+ is installed.
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # Windows: venv\Scripts\activate
-   ```
+2. Create a virtual environment (optional but recommended):
 
-3. ডিপেন্ডেন্সি ইনস্টল করুন:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. অ্যাপ চালান:
-
-   ```bash
-   python app.py
-   ```
-
-5. ব্রাউজারে যান: http://127.0.0.1:5000
-
-প্রথমবার চালানোর সময় `plans.db` নামে একটি SQLite ডাটাবেজ ফাইল তৈরি হবে — এটাতেই সব ইউজার এবং পরিকল্পনা সংরক্ষিত হবে।
-
-## ফিচারসমূহ
-
-- ইমেইল/পাসওয়ার্ড দিয়ে সাইন আপ ও লগইন (Flask-Login)
-- নিজের ড্যাশবোর্ডে সব পরিকল্পনার তালিকা দেখা, সম্পাদনা ও মুছে ফেলা
-- প্রতিটি পরিকল্পনায়:
-  - শিরোনাম, প্রাপকের নাম, উপলক্ষ, তারিখ, সময়, স্থান, কভার ইমোজি ও একটি ব্যক্তিগত বার্তা
-  - একাধিক ধাপ/কার্যক্রম (টাইমলাইন আকারে) — সময়, ইমোজি, কার্যক্রম, নোট সহ, JS দিয়ে ডায়নামিকভাবে যোগ/মুছা যায়
-- প্রতিটি পরিকল্পনার জন্য একটি ইউনিক শেয়ার-লিংক (`/share/<slug>`) — লগইন ছাড়াই যে কেউ দেখতে পারবে
-- রোমান্টিক থিমের রেসপনসিভ UI
-- **এক ক্লিকে বাংলা ⇄ English টগল** (হেডারের 🌐 বাটন) — পছন্দটি `localStorage`-এ সংরক্ষিত থাকে, তাই প্রতিটি পেজে বজায় থাকে। ব্যবহারকারীর নিজের লেখা তথ্য (প্ল্যানের শিরোনাম, বার্তা ইত্যাদি) অনুবাদ হয় না — শুধু সাইটের ইন্টারফেস টেক্সট অনুবাদ হয়।
-
-### 🆕 নতুন সংযোজন (What's new)
-
-- **🌙 ডার্ক মোড** — হেডারের চাঁদ/সূর্য বাটনে ক্লিক করে থিম পাল্টানো যায়, পছন্দ সংরক্ষিত থাকে।
-- **⏳ লাইভ কাউন্টডাউন** — প্ল্যান তৈরির সময় একটি ঐচ্ছিক তারিখ-সময় দিলে শেয়ার পেইজে দিন/ঘণ্টা/মিনিট/সেকেন্ডের লাইভ কাউন্টডাউন দেখা যাবে।
-- **👁️ ভিউ কাউন্টার** — শেয়ার লিংকে কতবার ঢোকা হয়েছে তা মালিক দেখতে পারবেন।
-- **📄 ডুপ্লিকেট/কপি** — ড্যাশবোর্ড বা প্ল্যান পেইজ থেকে এক ক্লিকে যেকোনো প্ল্যানের কপি তৈরি করা যায়।
-- **🔍 সার্চ ও সর্ট** — ড্যাশবোর্ডে নাম/উপলক্ষ/শিরোনাম দিয়ে খোঁজা এবং নতুন/পুরনো/নাম অনুযায়ী সাজানো যায়।
-- **✨ Upcoming/Past ব্যাজ** — কাউন্টডাউন তারিখ অনুযায়ী প্ল্যান কার্ডে অবস্থা দেখা যায়।
-- **⬇️ ডাউনলোড/প্রিন্ট** — শেয়ার পেইজ থেকে ব্রাউজারের প্রিন্ট ডায়ালগ দিয়ে PDF হিসেবে সেভ করা যায় (প্রিন্ট-ফ্রেন্ডলি স্টাইল সহ)।
-- **টোস্ট নোটিফিকেশন** — কপি করার মতো অ্যাকশনে ব্লকিং `alert()`-এর বদলে মিষ্টি একটি নন-ব্লকিং টোস্ট দেখা যায়।
-- অ্যাকশন বাটনগুলো (দেখুন/সম্পাদনা/কপি/মুছুন) এখন পুরোপুরি সুষম ২×২ গ্রিডে সাজানো, যেকোনো স্ক্রিন সাইজে পরিষ্কার দেখায়।
-
-### 💌 নতুন: শুভেচ্ছাবার্তা / গেস্টবুক (Guestbook)
-
-শেয়ার পেইজের একদম নিচে এখন একটি **গেস্টবুক** যোগ করা হয়েছে —
-
-- যে কেউ (লগইন ছাড়াই) শেয়ার লিংকে গিয়ে একটি রিঅ্যাকশন ইমোজি (❤️ 🎉 😍 🥹 👏 🔥) বেছে নিয়ে নিজের নাম ও একটি ছোট্ট শুভেচ্ছাবার্তা রেখে যেতে পারবেন।
-- মালিক (owner) শেয়ার পেইজে গেলে প্রতিটি বার্তার পাশে একটি ✕ বাটন দেখবেন, যা দিয়ে অনুপযুক্ত/স্প্যাম বার্তা মুছে ফেলা যায়।
-- উপরে একটি রিঅ্যাকশন-ট্যালি (যেমন ❤️ 5, 🎉 2) দেখা যায়, এবং মালিকের টুলবারে মোট শুভেচ্ছাবার্তার সংখ্যাও দেখানো হয়।
-- স্প্যাম বট ঠেকাতে একটি লুকানো "honeypot" ফিল্ড ব্যবহার করা হয়েছে — সাধারণ ব্যবহারকারীরা এটা দেখতেই পান না।
-- ডাউনলোড/প্রিন্ট করার সময় ফর্ম ও মুছার বাটন প্রিন্ট-আউটে দেখা যায় না, শুধু বার্তাগুলো দেখা যায়।
-
-## প্রজেক্ট স্ট্রাকচার
-
+```bash
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
 ```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the application:
+
+```bash
+python app.py
+```
+
+5. Open your browser and visit:
+
+http://127.0.0.1:5000
+
+When running the application for the first time, a SQLite database file named `plans.db` will be created automatically. All users and plans will be stored in this database.
+
+---
+
+## Features
+
+### User Authentication
+- Secure user registration and login using email and password.
+- User session management powered by Flask-Login.
+- Protected dashboard and plan management system.
+
+### Plan Management
+- Create, edit, duplicate, and delete personalized plans.
+- Organize plans from a clean and modern dashboard.
+- View all created plans in one place.
+
+### Rich Plan Details
+Each plan can include:
+
+- Title
+- Recipient Name
+- Occasion
+- Event Date
+- Event Time
+- Location
+- Cover Emoji
+- Personal Message
+
+### Timeline Activities
+- Add multiple activities or events to a plan.
+- Each activity supports:
+  - Time
+  - Emoji
+  - Activity Title
+  - Additional Notes
+- Dynamically add or remove timeline items using JavaScript.
+
+### Unique Shareable Links
+- Every plan receives a unique public URL.
+- Share plans with anyone.
+- Shared plans can be viewed without login.
+
+### Responsive & Romantic UI
+- Beautiful modern design optimized for:
+  - Desktop
+  - Laptop
+  - Tablet
+  - Mobile devices
+- Romantic visual style for special occasions.
+
+### Language Switching
+- One-click Bangla ⇄ English language toggle.
+- Language preference is stored in localStorage.
+- Works across all pages automatically.
+- User-created content remains unchanged.
+
+### Dark Mode
+- Toggle between Light and Dark themes.
+- Theme preference is saved automatically.
+- Consistent experience across sessions.
+
+### Live Countdown Timer
+- Optional countdown date and time for plans.
+- Shared pages display a live countdown showing:
+  - Days
+  - Hours
+  - Minutes
+  - Seconds
+
+### View Analytics
+- Track how many times a shared plan has been viewed.
+- Owners can monitor plan engagement.
+
+### Search & Sorting
+- Search plans by:
+  - Title
+  - Recipient Name
+  - Occasion
+- Sort plans by:
+  - Newest First
+  - Oldest First
+  - Alphabetical Order
+
+### Plan Status Indicators
+- Automatic Upcoming badge.
+- Automatic Past badge.
+- Visual event status tracking.
+
+### Download & Print Support
+- Print-friendly page design.
+- Save plans as PDF using the browser print dialog.
+- Clean formatting for physical copies.
+
+### Toast Notifications
+- Modern toast notifications.
+- Non-blocking user feedback.
+- Better experience than traditional alert popups.
+
+### Optimized Action Buttons
+- Clean 2×2 action grid layout.
+- Includes:
+  - View
+  - Edit
+  - Copy
+  - Delete
+- Fully responsive across all screen sizes.
+
+### Guestbook & Wishes System
+Visitors can:
+
+- Select a reaction emoji:
+  - ❤️ Love
+  - 🎉 Celebration
+  - 😍 Admiration
+  - 🥹 Emotional
+  - 👏 Appreciation
+  - 🔥 Awesome
+- Enter their name.
+- Leave a congratulatory message.
+- Participate without creating an account.
+
+Plan owners can:
+
+- View all guestbook messages.
+- Delete unwanted or spam messages.
+- See total message counts.
+- View reaction statistics.
+
+### Anti-Spam Protection
+- Hidden honeypot field for spam prevention.
+- Helps block automated bot submissions.
+
+### Print-Friendly Guestbook
+- Guest messages remain visible when printing.
+- Forms and delete buttons are automatically hidden.
+
+### Data Storage
+- SQLite database support out of the box.
+- Automatic database creation on first launch.
+- Stores:
+  - User Accounts
+  - Plans
+  - Timeline Items
+  - Guestbook Messages
+  - View Statistics
+
+---
+
+## Project Structure
+
+```text
 plan_share_app/
-├── app.py              # মূল Flask অ্যাপ ও রাউটসমূহ
-├── models.py           # SQLAlchemy মডেল (User, Plan, PlanItem)
+├── app.py
+├── models.py
 ├── requirements.txt
+├── plans.db
 ├── templates/
 │   ├── base.html
 │   ├── index.html
@@ -77,15 +194,32 @@ plan_share_app/
 │   ├── plan_form.html
 │   └── view_plan.html
 └── static/
-    ├── css/style.css
+    ├── css/
+    │   └── style.css
     └── js/
-        ├── i18n.js     # বাংলা/English ডিকশনারি ও টগল লজিক
-        ├── theme.js    # ডার্ক/লাইট মোড টগল লজিক
+        ├── i18n.js
+        ├── theme.js
         └── main.js
 ```
 
-## Production নোট
+---
 
-- `app.py`-তে `SECRET_KEY` অবশ্যই পরিবর্তন করুন (এনভায়রনমেন্ট ভ্যারিয়েবল দিয়ে সেট করা ভালো)।
-- `debug=True` প্রোডাকশনে বন্ধ রাখুন এবং gunicorn/waitress এর মতো WSGI সার্ভার ব্যবহার করুন।
-- বড় স্কেলে SQLite এর বদলে PostgreSQL/MySQL ব্যবহার করা ভালো।
+## Production Notes
+
+- Change the `SECRET_KEY` before deployment.
+- Store secrets using environment variables.
+- Disable `debug=True` in production.
+- Use Gunicorn, Waitress, or another production-ready WSGI server.
+- For large-scale deployments, use PostgreSQL or MySQL instead of SQLite.
+
+---
+
+## Copyright
+
+Copyright © 2026 MD Shahidul Khan Pappo.
+
+All Rights Reserved.
+
+This project is proprietary software. No part of this project may be copied, modified, distributed, sold, sublicensed, or reused without prior written permission from the author.
+
+Made with for creating unforgettable moments with your loved ones.
