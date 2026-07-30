@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}প্রোফাইল সম্পাদনা{% endblock %}
+{% block title_key %}title.profile_edit{% endblock %}
+
+{% block content %}
+<section class="form-card profile-edit-card">
+  <h2 data-i18n="profileform.heading">প্রোফাইল সম্পাদনা করুন</h2>
+  <p class="form-card-sub" data-i18n="profileform.sub">আপনার তথ্য আপডেট করুন।</p>
+
+  <form method="POST" novalidate enctype="multipart/form-data">
+    <p class="form-section-title" data-i18n="profileform.section_photo">প্রোফাইল ছবি</p>
+
+    <div class="avatar-upload" id="avatar-upload">
+      <div class="avatar-upload-preview" id="avatar-preview">
+        {% if current_user.avatar_image %}
+          <img id="avatar-preview-img" src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar_image) }}" alt="" />
+        {% else %}
+          <img id="avatar-preview-img" src="" alt="" style="display:none;" />
+          <span id="avatar-preview-emoji">{{ current_user.avatar_emoji or '🙂' }}</span>
+        {% endif %}
+        <label for="avatar_image" class="avatar-upload-edit-btn" data-i18n-aria-label="profileform.change_photo" aria-label="ছবি পরিবর্তন করুন">📷</label>
+      </div>
+      <div class="avatar-upload-actions">
+        <label for="avatar_image" class="btn btn-outline btn-small" data-i18n="profileform.upload_photo">ছবি আপলোড করুন</label>
+        <button type="button" class="btn btn-ghost btn-small" id="avatar-remove-btn"
+                style="{{ 'display:none;' if not current_user.avatar_image }}" data-i18n="profileform.remove_photo">ছবি সরান</button>
+        <input type="file" id="avatar_image" name="avatar_image" accept="image/png,image/jpeg,image/gif,image/webp" hidden />
+      </div>
+      <p class="avatar-upload-hint" data-i18n="profileform.photo_hint">PNG, JPG, GIF বা WEBP — সর্বোচ্চ ৫ এমবি</p>
+      <input type="hidden" name="remove_avatar" id="remove_avatar" value="0" />
+    </div>
+
+    <hr class="divider" />
+
+    <p class="form-section-title" data-i18n="planform.section_basic">মূল তথ্য</p>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="name" data-i18n="register.name_label">আপনার নাম</label>
+        <input type="text" id="name" name="name" required
+               value="{{ current_user.name }}" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="avatar_emoji" data-i18n="profileform.avatar_label">প্রোফাইল ইমোজি (ছবি না থাকলে দেখা যাবে)</label>
+        <input type="text" id="avatar_emoji" name="avatar_emoji" maxlength="4" placeholder="🙂"
+               value="{{ current_user.avatar_emoji or '🙂' }}" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email" data-i18n="auth.email_label">ইমেইল</label>
+      <input type="email" id="email" name="email" required
+             value="{{ current_user.email }}" autocomplete="email" />
+    </div>
+
+    <div class="field">
+      <label for="bio" data-i18n="profileform.bio_label">সংক্ষিপ্ত পরিচিতি</label>
+      <textarea id="bio" name="bio" rows="3"
+                placeholder="নিজের সম্পর্কে দুই এক কথা লিখুন..." data-i18n-placeholder="profileform.bio_placeholder">{{ current_user.bio or '' }}</textarea>
+    </div>
+
+    <hr class="divider" />
+
+    <p class="form-section-title" data-i18n="profileform.section_password">পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)</p>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="new_password" data-i18n="profileform.new_password_label">নতুন পাসওয়ার্ড</label>
+        <input type="password" id="new_password" name="new_password" minlength="6"
+               placeholder="খালি রাখুন যদি পরিবর্তন না করতে চান" data-i18n-placeholder="profileform.new_password_placeholder"
+               autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label for="confirm_password" data-i18n="register.confirm_label">পাসওয়ার্ড আবার লিখুন</label>
+        <input type="password" id="confirm_password" name="confirm_password" minlength="6"
+               placeholder="একই পাসওয়ার্ড আবার লিখুন" data-i18n-placeholder="register.confirm_placeholder"
+               autocomplete="new-password" />
+      </div>
+    </div>
+
+    <div class="form-submit-row">
+      <a href="{{ url_for('profile') }}" class="btn btn-outline" data-i18n="profileform.cancel">বাতিল করুন</a>
+      <button type="submit" class="btn btn-primary" data-i18n="profileform.submit">প্রোফাইল আপডেট করুন</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

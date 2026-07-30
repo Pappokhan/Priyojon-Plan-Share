@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}প্রিয়জন প্ল্যান — আপনার প্রিয় মানুষের জন্য পরিকল্পনা করুন{% endblock %}
+{% block title_key %}title.index{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <span class="hero-bg-shape shape-1"></span>
+    <span class="hero-bg-shape shape-2"></span>
+    <span class="hero-bg-shape shape-3"></span>
+    <span class="hero-bg-shape shape-4"></span>
+    <span class="hero-bg-emoji emoji-1">💖</span>
+    <span class="hero-bg-emoji emoji-2">✨</span>
+    <span class="hero-bg-emoji emoji-3">🎁</span>
+    <span class="hero-bg-emoji emoji-4">💕</span>
+  </div>
+  <div class="hero-content">
+  <div class="hero-emoji">💖 ✨ 🎁</div>
+  <h1 data-i18n-html="index.hero_heading_html">আপনার প্রিয় মানুষের জন্য<br>একটি সুন্দর পরিকল্পনা তৈরি করুন</h1>
+  <p class="hero-sub" data-i18n="index.hero_sub">
+    জন্মদিন, অ্যানিভার্সারি, ডেট নাইট, কিংবা যেকোনো বিশেষ দিন — ধাপে ধাপে
+    পরিকল্পনা সাজান এবং একটি সুন্দর লিংকের মাধ্যমে তাকে সারপ্রাইজ দিন।
+  </p>
+  <div class="hero-actions">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('create_plan') }}" class="btn btn-primary" data-i18n="index.cta_new_plan">নতুন পরিকল্পনা তৈরি করুন</a>
+    {% else %}
+      <a href="{{ url_for('register') }}" class="btn btn-primary" data-i18n="index.cta_register">ফ্রি একাউন্ট খুলুন</a>
+      <a href="{{ url_for('login') }}" class="btn btn-outline" data-i18n="index.cta_login">লগইন করুন</a>
+    {% endif %}
+  </div>
+  </div>
+</section>
+
+<section class="stats-section">
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-card-icon">👥</div>
+      <div class="stat-card-num">{{ stats.total_users }}</div>
+      <div class="stat-card-label" data-i18n="index.stat_users">জন ব্যবহারকারী যুক্ত হয়েছেন</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">📋</div>
+      <div class="stat-card-num">{{ stats.total_plans }}</div>
+      <div class="stat-card-label" data-i18n="index.stat_plans">টি পরিকল্পনা তৈরি হয়েছে</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <p class="chart-title" data-i18n="index.chart_title">গত ৬ মাসের প্রবৃদ্ধি</p>
+    <div class="chart-legend">
+      <span class="legend-item"><span class="legend-dot legend-dot-users"></span> <span data-i18n="index.legend_users">ব্যবহারকারী</span></span>
+      <span class="legend-item"><span class="legend-dot legend-dot-plans"></span> <span data-i18n="index.legend_plans">পরিকল্পনা</span></span>
+    </div>
+    <div class="chart-bars">
+      {% for row in stats.chart_data %}
+      <div class="chart-month">
+        <div class="bar-group">
+          <div class="bar bar-users" style="height: {{ row.users_pct }}%;" title="{{ row.users }}">
+            <span class="bar-value">{{ row.users }}</span>
+          </div>
+          <div class="bar bar-plans" style="height: {{ row.plans_pct }}%;" title="{{ row.plans }}">
+            <span class="bar-value">{{ row.plans }}</span>
+          </div>
+        </div>
+        <span class="chart-month-label">{{ row.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<p class="section-eyebrow" data-i18n="index.eyebrow">কীভাবে কাজ করে</p>
+<section class="features">
+  <div class="feature-card">
+    <div class="feature-icon">📝</div>
+    <h3 data-i18n="index.feature1_title">সহজে পরিকল্পনা তৈরি</h3>
+    <p data-i18n="index.feature1_desc">সময়, স্থান ও ধাপে ধাপে কর্মসূচি যোগ করুন — ঠিক যেমনটা চান।</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔗</div>
+    <h3 data-i18n="index.feature2_title">শেয়ার করুন এক ক্লিকে</h3>
+    <p data-i18n="index.feature2_desc">প্রতিটি পরিকল্পনার জন্য একটি সুন্দর, প্রাইভেট শেয়ার-লিংক পাবেন।</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">💌</div>
+    <h3 data-i18n="index.feature3_title">রোমান্টিক ডিজাইন</h3>
+    <p data-i18n="index.feature3_desc">যাকে পাঠাবেন সে দেখবে একটি সুন্দর, যত্ন করে সাজানো পেইজ।</p>
+  </div>
+</section>
+{% endblock %}

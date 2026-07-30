@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}লগইন{% endblock %}
+{% block title_key %}title.login{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+  <h2 data-i18n="login.heading">লগইন করুন</h2>
+  <p class="auth-card-sub" data-i18n="login.sub">আপনার একাউন্টে ফিরে আসুন</p>
+  <form method="POST" novalidate>
+    <div class="field">
+      <label for="email" data-i18n="auth.email_label">ইমেইল</label>
+      <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email" />
+    </div>
+
+    <div class="field">
+      <label for="password" data-i18n="auth.password_label">পাসওয়ার্ড</label>
+      <input type="password" id="password" name="password" required
+             placeholder="আপনার পাসওয়ার্ড" data-i18n-placeholder="auth.password_placeholder" autocomplete="current-password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" data-i18n="login.submit">লগইন</button>
+  </form>
+  <p class="auth-alt">
+    <span data-i18n="login.alt_text">নতুন এখানে?</span>
+    <a href="{{ url_for('register') }}" data-i18n="login.alt_link">একাউন্ট তৈরি করুন</a>
+  </p>
+</section>
+{% endblock %}

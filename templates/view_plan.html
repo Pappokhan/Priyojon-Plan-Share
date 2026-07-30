@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.title }}{% endblock %}
+
+{% block content %}
+<section class="plan-view">
+
+  {% if is_owner %}
+  <div class="share-box">
+    <span class="share-box-label" data-i18n="view.share_label">🔗 শেয়ার লিংক:</span>
+    <input type="text" readonly id="share-link" value="{{ request.url_root.rstrip('/') }}{{ url_for('shared_plan', slug=plan.share_slug) }}" />
+    <button type="button" class="btn btn-small btn-primary" id="copy-share-link" data-i18n="view.copy">কপি করুন</button>
+    <a href="{{ url_for('edit_plan', plan_id=plan.id) }}" class="btn btn-small btn-outline" data-i18n="view.edit">সম্পাদনা</a>
+  </div>
+
+  <div class="owner-toolbar">
+    <span class="views-chip" title="Views">👁️ <span data-i18n="view.views_label">দেখেছেন</span> <strong>{{ plan.views or 0 }}</strong></span>
+    <span class="views-chip" title="Wishes">💌 <span data-i18n="view.wishes_label">শুভেচ্ছাবার্তা</span> <strong>{{ plan.wishes|length }}</strong></span>
+    <div class="owner-toolbar-actions">
+      <form method="POST" action="{{ url_for('duplicate_plan', plan_id=plan.id) }}">
+        <button type="submit" class="btn btn-small btn-outline" data-i18n="view.duplicate">📄 কপি তৈরি করুন</button>
+      </form>
+      <button type="button" class="btn btn-small btn-outline js-print-plan" data-i18n="view.download">⬇️ ডাউনলোড / প্রিন্ট</button>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if plan.event_datetime %}
+  <div class="countdown-card" id="countdown-card" data-event-time="{{ plan.event_datetime.isoformat() }}">
+    <p class="countdown-heading" data-i18n="view.countdown_heading">⏳ শুরু হতে বাকি</p>
+    <div class="countdown-grid">
+      <div class="countdown-unit"><span class="countdown-num" data-unit="days">00</span><span class="countdown-label" data-i18n="countdown.days">দিন</span></div>
+      <div class="countdown-unit"><span class="countdown-num" data-unit="hours">00</span><span class="countdown-label" data-i18n="countdown.hours">ঘণ্টা</span></div>
+      <div class="countdown-unit"><span class="countdown-num" data-unit="minutes">00</span><span class="countdown-label" data-i18n="countdown.minutes">মিনিট</span></div>
+      <div class="countdown-unit"><span class="countdown-num" data-unit="seconds">00</span><span class="countdown-label" data-i18n="countdown.seconds">সেকেন্ড</span></div>
+    </div>
+    <p class="countdown-arrived" id="countdown-arrived" data-i18n="countdown.arrived" hidden>🎉 সময় হয়ে গেছে!</p>
+  </div>
+  {% endif %}
+
+  <div class="plan-hero">
+    <div class="plan-hero-emoji">{{ plan.cover_emoji }}</div>
+    <h1>{{ plan.title }}</h1>
+    <p class="plan-hero-for">
+      <span data-i18n="view.for_prefix">✨ বিশেষভাবে তৈরি করা হয়েছে</span>
+      <strong>{{ plan.recipient_name }}</strong>
+      <span data-i18n="view.for_suffix">-এর জন্য ✨</span>
+    </p>
+
+    <div class="plan-meta-row">
+      {% if plan.occasion %}<span class="chip">🎉 {{ plan.occasion }}</span>{% endif %}
+      {% if plan.plan_date %}<span class="chip">📅 {{ plan.plan_date }}</span>{% endif %}
+      {% if plan.plan_time %}<span class="chip">⏰ {{ plan.plan_time }}</span>{% endif %}
+      {% if plan.location %}<span class="chip">📍 {{ plan.location }}</span>{% endif %}
+    </div>
+  </div>
+
+  {% if plan.description %}
+  <div class="plan-message">
+    <p>{{ plan.description }}</p>
+  </div>
+  {% endif %}
+
+  {% if plan.items %}
+  <p class="section-heading" data-i18n="view.schedule_heading">সময়সূচি</p>
+  <div class="timeline">
+    {% for item in plan.items %}
+    <div class="timeline-item">
+      <div class="timeline-icon">{{ item.icon }}</div>
+      <div class="timeline-content">
+        {% if item.time_label %}<div class="timeline-time">{{ item.time_label }}</div>{% endif %}
+        <div class="timeline-activity">{{ item.activity }}</div>
+        {% if item.note %}<div class="timeline-note">{{ item.note }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="plan-footer-msg" data-i18n="view.footer_msg">💕 এই মুহূর্তগুলো তোমার জন্য, শুধু তোমার জন্য 💕</div>
+
+  <section class="wishes-section" id="wishes">
+    <p class="section-heading" data-i18n="wishes.heading">💌 শুভেচ্ছাবার্তা</p>
+    <p class="wishes-sub" data-i18n="wishes.sub">যিনি এই লিংক দেখছেন, তিনি এখানে একটি ছোট্ট শুভেচ্ছাবার্তা রেখে যেতে পারেন।</p>
+
+    {% if wish_reactions %}
+    <div class="wishes-reaction-bar">
+      {% for emoji, count in wish_reactions %}
+      <span class="wishes-reaction-chip">{{ emoji }} <strong>{{ count }}</strong></span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('add_wish', slug=plan.share_slug) }}" class="wish-form">
+      <div class="wish-form-emoji-row" role="radiogroup" aria-label="Reaction">
+        {% for e in ['❤️', '🎉', '😍', '🥹', '👏', '🔥'] %}
+        <label class="wish-emoji-option">
+          <input type="radio" name="wish_emoji" value="{{ e }}" {% if loop.first %}checked{% endif %} />
+          <span>{{ e }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="wish_name" data-i18n="wishes.name_label">আপনার নাম</label>
+          <input type="text" id="wish_name" name="wish_name" maxlength="60" required
+                 placeholder="তোমার বন্ধু" data-i18n-placeholder="wishes.name_placeholder" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="wish_message" data-i18n="wishes.message_label">শুভেচ্ছাবার্তা</label>
+        <textarea id="wish_message" name="wish_message" maxlength="300" rows="3" required
+                  placeholder="তোমাদের জন্য শুভকামনা রইলো..." data-i18n-placeholder="wishes.message_placeholder"></textarea>
+      </div>
+      <!-- Honeypot field: hidden from real visitors via CSS, invisible to screen readers -->
+      <div class="wish-honeypot" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <button type="submit" class="btn btn-primary" data-i18n="wishes.submit">শুভেচ্ছা পাঠান</button>
+    </form>
+
+    {% if plan.wishes %}
+    <div class="wishes-list">
+      {% for wish in plan.wishes %}
+      <div class="wish-card">
+        <div class="wish-card-emoji">{{ wish.emoji or '❤️' }}</div>
+        <div class="wish-card-body">
+          <p class="wish-card-name">{{ wish.name }}</p>
+          <p class="wish-card-message">{{ wish.message }}</p>
+        </div>
+        {% if is_owner %}
+        <form method="POST" action="{{ url_for('delete_wish', plan_id=plan.id, wish_id=wish.id) }}" class="wish-card-delete">
+          <button type="submit" class="btn-icon" data-i18n-aria-label="wishes.delete" aria-label="Delete wish" title="Delete">✕</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="wishes-empty" data-i18n="wishes.empty">এখনো কোনো শুভেচ্ছাবার্তা আসেনি — প্রথম বার্তাটি আপনার হতে পারে!</p>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ---------- Copy share link ----------
+    var btn = document.getElementById('copy-share-link');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var input = document.getElementById('share-link');
+        input.select();
+        input.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(input.value).then(function () {
+          var msg = window.ppI18n ? window.ppI18n.t('view.copied') : 'Link copied!';
+          if (window.ppToast) window.ppToast(msg, 'success');
+          else alert(msg);
+        });
+      });
+    }
+
+    // ---------- Print / download as PDF ----------
+    var printBtn = document.querySelector('.js-print-plan');
+    if (printBtn) {
+      printBtn.addEventListener('click', function () { window.print(); });
+    }
+
+    // ---------- Live countdown ----------
+    var card = document.getElementById('countdown-card');
+    if (!card) return;
+    var target = new Date(card.getAttribute('data-event-time'));
+    var arrivedEl = document.getElementById('countdown-arrived');
+    var gridEl = card.querySelector('.countdown-grid');
+
+    function tick() {
+      var diff = target.getTime() - Date.now();
+      if (isNaN(diff)) return;
+      if (diff <= 0) {
+        if (gridEl) gridEl.style.display = 'none';
+        if (arrivedEl) arrivedEl.hidden = false;
+        clearInterval(timer);
+        return;
+      }
+      var seconds = Math.floor(diff / 1000);
+      var days = Math.floor(seconds / 86400);
+      var hours = Math.floor((seconds % 86400) / 3600);
+      var minutes = Math.floor((seconds % 3600) / 60);
+      var secs = seconds % 60;
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+      card.querySelector('[data-unit="days"]').textContent = pad(days);
+      card.querySelector('[data-unit="hours"]').textContent = pad(hours);
+      card.querySelector('[data-unit="minutes"]').textContent = pad(minutes);
+      card.querySelector('[data-unit="seconds"]').textContent = pad(secs);
+    }
+
+    tick();
+    var timer = setInterval(tick, 1000);
+  });
+</script>
+{% endblock %}

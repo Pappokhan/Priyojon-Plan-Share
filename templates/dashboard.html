@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}আমার পরিকল্পনাসমূহ{% endblock %}
+{% block title_key %}title.dashboard{% endblock %}
+
+{% block content %}
+<section class="dashboard-head">
+  <div>
+    <h2 data-i18n="dashboard.heading">আমার পরিকল্পনাসমূহ</h2>
+    {% if plans %}<p class="dashboard-count" data-count="{{ plans|length }}">{{ plans|length }}টি পরিকল্পনা</p>{% endif %}
+  </div>
+  <a href="{{ url_for('create_plan') }}" class="btn btn-primary" data-i18n="dashboard.new_plan">+ নতুন পরিকল্পনা</a>
+</section>
+
+{% if plans %}
+<div class="dashboard-toolbar">
+  <div class="dashboard-search">
+    <span class="dashboard-search-icon" aria-hidden="true">🔍</span>
+    <input type="search" id="plan-search" data-i18n-placeholder="dashboard.search_placeholder" placeholder="নাম, উপলক্ষ বা শিরোনাম দিয়ে খুঁজুন..." aria-label="Search plans" />
+  </div>
+  <select id="plan-sort" class="dashboard-sort">
+    <option value="newest" data-i18n="dashboard.sort_newest">নতুন আগে</option>
+    <option value="oldest" data-i18n="dashboard.sort_oldest">পুরনো আগে</option>
+    <option value="az" data-i18n="dashboard.sort_az">নাম (A-Z)</option>
+  </select>
+</div>
+
+<div class="plan-grid" id="plan-grid">
+  {% for plan in plans %}
+  <div class="plan-card"
+       data-search="{{ (plan.title ~ ' ' ~ plan.recipient_name ~ ' ' ~ (plan.occasion or ''))|lower }}"
+       data-title="{{ plan.title|lower }}"
+       data-created="{{ plan.created_at.timestamp() if plan.created_at else 0 }}">
+    <div class="plan-card-top">
+      <div class="plan-card-emoji">{{ plan.cover_emoji }}</div>
+      <h3>{{ plan.title }}</h3>
+    </div>
+    {% if plan.event_datetime %}
+      {% if plan.event_datetime > now %}
+      <span class="status-badge status-upcoming" data-i18n="badge.upcoming">✨ আসছে</span>
+      {% else %}
+      <span class="status-badge status-past" data-i18n="badge.past">✔️ সম্পন্ন</span>
+      {% endif %}
+    {% endif %}
+    <div class="plan-card-meta-list">
+      <p class="plan-card-meta">👤 {{ plan.recipient_name }}</p>
+      {% if plan.plan_date %}<p class="plan-card-meta">📅 {{ plan.plan_date }}{% if plan.plan_time %} · {{ plan.plan_time }}{% endif %}</p>{% endif %}
+      {% if plan.occasion %}<p class="plan-card-meta">🎉 {{ plan.occasion }}</p>{% endif %}
+      {% if plan.views %}<p class="plan-card-meta">👁️ {{ plan.views }} <span data-i18n="dashboard.views_suffix">বার দেখা হয়েছে</span></p>{% endif %}
+      {% if plan.wishes %}<p class="plan-card-meta">💌 {{ plan.wishes|length }} <span data-i18n="dashboard.wishes_suffix">শুভেচ্ছাবার্তা</span></p>{% endif %}
+    </div>
+    <div class="plan-card-actions">
+      <a href="{{ url_for('view_owner_plan', plan_id=plan.id) }}" class="btn btn-small btn-primary" data-i18n="dashboard.view">দেখুন</a>
+      <a href="{{ url_for('edit_plan', plan_id=plan.id) }}" class="btn btn-small btn-outline" data-i18n="dashboard.edit">সম্পাদনা</a>
+      <form method="POST" action="{{ url_for('duplicate_plan', plan_id=plan.id) }}">
+        <button type="submit" class="btn btn-small btn-outline" data-i18n="dashboard.duplicate">কপি</button>
+      </form>
+      <form method="POST" action="{{ url_for('delete_plan', plan_id=plan.id) }}" class="js-delete-plan-form">
+        <button type="submit" class="btn btn-small btn-danger" data-i18n="dashboard.delete">মুছুন</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<p class="dashboard-no-results" id="dashboard-no-results" data-i18n="dashboard.no_results" hidden>😕 কোনো পরিকল্পনা পাওয়া যায়নি।</p>
+{% else %}
+<div class="empty-state">
+  <div class="empty-state-emoji">📭</div>
+  <p data-i18n="dashboard.empty_text">এখনো কোনো পরিকল্পনা তৈরি করেননি।</p>
+  <a href="{{ url_for('create_plan') }}" class="btn btn-primary" data-i18n="dashboard.empty_cta">প্রথম পরিকল্পনা তৈরি করুন</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var searchInput = document.getElementById('plan-search');
+    var sortSelect = document.getElementById('plan-sort');
+    var grid = document.getElementById('plan-grid');
+    var noResults = document.getElementById('dashboard-no-results');
+    if (!grid) return;
+
+    function applyFilter() {
+      var query = (searchInput.value || '').trim().toLowerCase();
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('.plan-card'));
+      var visibleCount = 0;
+      cards.forEach(function (card) {
+        var matches = !query || card.getAttribute('data-search').indexOf(query) !== -1;
+        card.style.display = matches ? '' : 'none';
+        if (matches) visibleCount += 1;
+      });
+      if (noResults) noResults.hidden = visibleCount !== 0;
+    }
+
+    function applySort() {
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('.plan-card'));
+      var mode = sortSelect.value;
+      cards.sort(function (a, b) {
+        if (mode === 'az') {
+          return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+        }
+        var aTime = parseFloat(a.getAttribute('data-created')) || 0;
+        var bTime = parseFloat(b.getAttribute('data-created')) || 0;
+        return mode === 'oldest' ? aTime - bTime : bTime - aTime;
+      });
+      cards.forEach(function (card) { grid.appendChild(card); });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applyFilter);
+    if (sortSelect) sortSelect.addEventListener('change', applySort);
+  });
+</script>
+{% endblock %}

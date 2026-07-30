@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}একাউন্ট তৈরি করুন{% endblock %}
+{% block title_key %}title.register{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+  <h2 data-i18n="register.heading">একাউন্ট তৈরি করুন</h2>
+  <p class="auth-card-sub" data-i18n="register.sub">কয়েক সেকেন্ডে শুরু করুন — সম্পূর্ণ ফ্রি</p>
+  <form method="POST" novalidate>
+    <div class="field">
+      <label for="name" data-i18n="register.name_label">আপনার নাম</label>
+      <input type="text" id="name" name="name" required
+             placeholder="যেমন: রাহুল" data-i18n-placeholder="register.name_placeholder" autocomplete="name" />
+    </div>
+
+    <div class="field">
+      <label for="email" data-i18n="auth.email_label">ইমেইল</label>
+      <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email" />
+    </div>
+
+    <div class="field">
+      <label for="password" data-i18n="auth.password_label">পাসওয়ার্ড</label>
+      <input type="password" id="password" name="password" required minlength="6"
+             placeholder="কমপক্ষে ৬ অক্ষর" data-i18n-placeholder="register.password_placeholder" autocomplete="new-password" />
+    </div>
+
+    <div class="field">
+      <label for="confirm" data-i18n="register.confirm_label">পাসওয়ার্ড আবার লিখুন</label>
+      <input type="password" id="confirm" name="confirm" required minlength="6"
+             placeholder="একই পাসওয়ার্ড আবার লিখুন" data-i18n-placeholder="register.confirm_placeholder" autocomplete="new-password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" data-i18n="register.submit">একাউন্ট তৈরি করুন</button>
+  </form>
+  <p class="auth-alt">
+    <span data-i18n="register.alt_text">আগে থেকে একাউন্ট আছে?</span>
+    <a href="{{ url_for('login') }}" data-i18n="register.alt_link">লগইন করুন</a>
+  </p>
+</section>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}{% if plan %}পরিকল্পনা সম্পাদনা{% else %}নতুন পরিকল্পনা{% endif %}{% endblock %}
+{% block title_key %}{% if plan %}title.plan_edit{% else %}title.plan_new{% endif %}{% endblock %}
+
+{% block content %}
+<section class="form-card">
+  <h2 data-i18n="{% if plan %}planform.heading_edit{% else %}planform.heading_new{% endif %}">{% if plan %}পরিকল্পনা সম্পাদনা করুন{% else %}নতুন পরিকল্পনা তৈরি করুন{% endif %}</h2>
+  <p class="form-card-sub" data-i18n="planform.sub">নিচের ঘরগুলো পূরণ করে আপনার বিশেষ পরিকল্পনাটি সাজান।</p>
+
+  <form method="POST" id="plan-form">
+    <p class="form-section-title" data-i18n="planform.section_basic">মূল তথ্য</p>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="title" data-i18n="planform.title_label">পরিকল্পনার শিরোনাম</label>
+        <input type="text" id="title" name="title" required
+               placeholder="যেমন: তোমার জন্য একটি বিশেষ সন্ধ্যা" data-i18n-placeholder="planform.title_placeholder"
+               value="{{ plan.title if plan else '' }}" />
+      </div>
+      <div class="field">
+        <label for="recipient_name" data-i18n="planform.recipient_label">কার জন্য (নাম)</label>
+        <input type="text" id="recipient_name" name="recipient_name" required
+               placeholder="যেমন: প্রিয়া" data-i18n-placeholder="planform.recipient_placeholder"
+               value="{{ plan.recipient_name if plan else '' }}" />
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="field">
+        <label for="occasion" data-i18n="planform.occasion_label">উপলক্ষ</label>
+        <input type="text" id="occasion" name="occasion"
+               placeholder="জন্মদিন / অ্যানিভার্সারি / এমনি" data-i18n-placeholder="planform.occasion_placeholder"
+               value="{{ plan.occasion if plan else '' }}" />
+      </div>
+      <div class="field">
+        <label for="plan_date" data-i18n="planform.date_label">তারিখ</label>
+        <input type="text" id="plan_date" name="plan_date"
+               placeholder="২৯ জুলাই, ২০২৬" data-i18n-placeholder="planform.date_placeholder"
+               value="{{ plan.plan_date if plan else '' }}" />
+      </div>
+      <div class="field">
+        <label for="plan_time" data-i18n="planform.time_label">সময়</label>
+        <input type="text" id="plan_time" name="plan_time"
+               placeholder="সন্ধ্যা ৭টা" data-i18n-placeholder="planform.time_placeholder"
+               value="{{ plan.plan_time if plan else '' }}" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="location" data-i18n="planform.location_label">স্থান</label>
+        <input type="text" id="location" name="location"
+               placeholder="যেমন: ছাদ, ধানমন্ডি লেক..." data-i18n-placeholder="planform.location_placeholder"
+               value="{{ plan.location if plan else '' }}" />
+      </div>
+      <div class="field">
+        <label for="cover_emoji" data-i18n="planform.emoji_label">কভার ইমোজি</label>
+        <input type="text" id="cover_emoji" name="cover_emoji" maxlength="4" placeholder="💖"
+               value="{{ plan.cover_emoji if plan else '💖' }}" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="description" data-i18n="planform.description_label">বার্তা / ভূমিকা</label>
+      <textarea id="description" name="description" rows="3"
+                placeholder="তার জন্য একটি ছোট্ট মিষ্টি বার্তা লিখুন..." data-i18n-placeholder="planform.description_placeholder">{{ plan.description if plan else '' }}</textarea>
+    </div>
+
+    <div class="field">
+      <label for="event_datetime" data-i18n="planform.countdown_label">🕑 কাউন্টডাউনের জন্য সঠিক তারিখ ও সময় (ঐচ্ছিক)</label>
+      <input type="datetime-local" id="event_datetime" name="event_datetime"
+             value="{{ plan.event_datetime.strftime('%Y-%m-%dT%H:%M') if plan and plan.event_datetime else '' }}" />
+      <p class="field-hint" data-i18n="planform.countdown_hint">দিলে শেয়ার পেইজে একটি লাইভ কাউন্টডাউন দেখা যাবে।</p>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="items-head">
+      <h3 data-i18n="planform.items_heading">ধাপে ধাপে পরিকল্পনা</h3>
+      <button type="button" class="btn btn-small btn-outline" id="add-item" data-i18n="planform.add_item">+ ধাপ যোগ করুন</button>
+    </div>
+
+    <div class="items-table">
+      <div class="item-row-labels" aria-hidden="true">
+        <span data-i18n="planform.col_time">সময়</span>
+        <span data-i18n="planform.col_icon">ইমোজি</span>
+        <span data-i18n="planform.col_activity">কার্যক্রম</span>
+        <span data-i18n="planform.col_note">নোট</span>
+        <span></span>
+      </div>
+
+      <div id="items-container">
+        {% if plan and plan.items %}
+          {% for item in plan.items %}
+          <div class="item-row">
+            <input type="text" name="item_time" placeholder="যেমন: সন্ধ্যা ৭টা" data-i18n-placeholder="planform.item_time_placeholder" aria-label="সময়" data-i18n-aria-label="planform.col_time" value="{{ item.time_label }}" />
+            <input type="text" name="item_icon" placeholder="🎬" maxlength="4" aria-label="ইমোজি" data-i18n-aria-label="planform.col_icon" value="{{ item.icon }}" />
+            <input type="text" name="item_activity" placeholder="কার্যক্রম (যেমন: মুভি দেখা)" data-i18n-placeholder="planform.item_activity_placeholder" aria-label="কার্যক্রম" data-i18n-aria-label="planform.col_activity" value="{{ item.activity }}" />
+            <input type="text" name="item_note" placeholder="নোট (ঐচ্ছিক)" data-i18n-placeholder="planform.item_note_placeholder" aria-label="নোট" data-i18n-aria-label="planform.col_note" value="{{ item.note or '' }}" />
+            <button type="button" class="remove-item" aria-label="এই ধাপ মুছুন" data-i18n-aria-label="planform.remove_item_label">✕</button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="item-row">
+            <input type="text" name="item_time" placeholder="যেমন: সন্ধ্যা ৭টা" data-i18n-placeholder="planform.item_time_placeholder" aria-label="সময়" data-i18n-aria-label="planform.col_time" />
+            <input type="text" name="item_icon" placeholder="🎬" maxlength="4" aria-label="ইমোজি" data-i18n-aria-label="planform.col_icon" />
+            <input type="text" name="item_activity" placeholder="কার্যক্রম (যেমন: মুভি দেখা)" data-i18n-placeholder="planform.item_activity_placeholder" aria-label="কার্যক্রম" data-i18n-aria-label="planform.col_activity" />
+            <input type="text" name="item_note" placeholder="নোট (ঐচ্ছিক)" data-i18n-placeholder="planform.item_note_placeholder" aria-label="নোট" data-i18n-aria-label="planform.col_note" />
+            <button type="button" class="remove-item" aria-label="এই ধাপ মুছুন" data-i18n-aria-label="planform.remove_item_label">✕</button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-submit-row">
+      <button type="submit" class="btn btn-primary" data-i18n="{% if plan %}planform.submit_edit{% else %}planform.submit_new{% endif %}">
+        {% if plan %}পরিকল্পনা আপডেট করুন{% else %}পরিকল্পনা তৈরি করুন{% endif %}
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="আপনার প্রিয় মানুষের জন্য পরিকল্পনা তৈরি করুন এবং একটি সুন্দর লিংকের মাধ্যমে শেয়ার করুন।" />
+  <meta name="theme-color" content="#ff6b8b" />
+  <meta property="og:title" content="প্রিয়জন প্ল্যান" />
+  <meta property="og:description" content="আপনার প্রিয় মানুষের জন্য পরিকল্পনা তৈরি করুন এবং একটি সুন্দর লিংকের মাধ্যমে শেয়ার করুন।" />
+  <meta property="og:type" content="website" />
+  <title>{% block title %}প্রিয়জন প্ল্যান{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💌</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script>
+    // Apply the saved language + theme instantly (before first paint) to avoid a flash of the wrong language/theme.
+    (function () {
+      try {
+        var lang = window.localStorage.getItem('ppplan_lang');
+        if (lang === 'en' || lang === 'bn') document.documentElement.lang = lang;
+        var theme = window.localStorage.getItem('ppplan_theme');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body data-title-key="{% block title_key %}{% endblock %}">
+  <header class="site-header">
+    <a href="{{ url_for('index') }}" class="brand">💌 প্রিয়জন<span>প্ল্যান</span></a>
+
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" onclick="ppTheme.toggle()">
+        <span id="theme-toggle-icon" aria-hidden="true">🌙</span>
+      </button>
+
+      <button type="button" class="lang-toggle" id="lang-toggle" aria-label="View in English" aria-pressed="false" onclick="ppI18n.toggle()">
+        <span aria-hidden="true">🌐</span> <span id="lang-toggle-label">EN</span>
+      </button>
+
+      <button type="button" class="nav-toggle" id="nav-toggle" data-i18n-aria-label="nav.open_menu" aria-label="মেনু খুলুন" aria-expanded="false" aria-controls="site-nav">
+        <span></span>
+      </button>
+    </div>
+
+    <nav class="nav" id="site-nav">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}" data-i18n="nav.dashboard">আমার পরিকল্পনা</a>
+        <a href="{{ url_for('profile') }}" class="nav-profile-link">
+          {% if current_user.avatar_image %}
+            <img class="nav-avatar" src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar_image) }}" alt="" />
+          {% else %}
+            <span class="nav-avatar nav-avatar-emoji">{{ current_user.avatar_emoji or '🙂' }}</span>
+          {% endif %}
+          <span data-i18n="nav.profile">প্রোফাইল</span>
+        </a>
+        <a href="{{ url_for('create_plan') }}" class="btn btn-small btn-primary" data-i18n="nav.new_plan">+ নতুন প্ল্যান</a>
+        <a href="{{ url_for('logout') }}" data-i18n="nav.logout">লগআউট</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" data-i18n="nav.login">লগইন</a>
+        <a href="{{ url_for('register') }}" class="btn btn-small btn-primary" data-i18n="nav.register">শুরু করুন</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="site-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}" data-flash-key="{{ flash_keys.get(message, '') }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span data-i18n-html="footer.tagline_html">তৈরি হয়েছে ভালোবাসা দিয়ে 💕 — প্রিয়জন প্ল্যান</span>
+  </footer>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
