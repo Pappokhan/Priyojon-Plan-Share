@@ -26,11 +26,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Profile picture uploads
 app.config["AVATAR_UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "static", "uploads", "avatars")
-app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB request size cap
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024 
 ALLOWED_AVATAR_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 os.makedirs(app.config["AVATAR_UPLOAD_FOLDER"], exist_ok=True)
 
-# Guestbook (Wish) reaction emojis allowed on the public share page.
+# Guestbook
 ALLOWED_WISH_EMOJIS = {"❤️", "🎉", "😍", "🥹", "👏", "🔥"}
 DEFAULT_WISH_EMOJI = "❤️"
 
@@ -68,9 +68,6 @@ def _delete_avatar_file(filename):
         except OSError:
             pass
 
-# Maps each hardcoded Bengali flash message to its i18n dictionary key
-# (see static/js/i18n.js) so the frontend can translate it on the fly
-# when the visitor switches to English.
 FLASH_KEYS = {
     "প্রথমে লগইন করুন।": "flash.login_first",
     "সব ঘর পূরণ করুন।": "flash.fill_all",
@@ -166,11 +163,6 @@ with app.app_context():
     db.create_all()
 
 
-# --------------------------------------------------------------------------
-# Homepage stats (total users, total plans, monthly growth chart)
-# --------------------------------------------------------------------------
-
-
 def _shift_month(dt, delta):
     month_index = dt.month - 1 + delta
     year = dt.year + month_index // 12
@@ -206,11 +198,6 @@ def get_homepage_stats(months=6):
         "total_plans": total_plans,
         "chart_data": chart_data,
     }
-
-
-# --------------------------------------------------------------------------
-# Public pages
-# --------------------------------------------------------------------------
 
 
 @app.route("/")
@@ -272,10 +259,6 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-
-# --------------------------------------------------------------------------
-# Dashboard & plan management (login required)
-# --------------------------------------------------------------------------
 
 
 @app.route("/dashboard")
@@ -441,11 +424,6 @@ def _save_items_from_form(plan):
         position += 1
 
 
-# --------------------------------------------------------------------------
-# Profile (view & edit) — login required
-# --------------------------------------------------------------------------
-
-
 @app.route("/profile")
 @login_required
 def profile():
@@ -501,16 +479,10 @@ def edit_profile():
             db.session.commit()
             flash("প্রোফাইল আপডেট হয়েছে!", "success")
             return redirect(url_for("profile"))
-        # An invalid upload shouldn't leave an orphaned file on disk.
         if saved_filename:
             _delete_avatar_file(saved_filename)
 
     return render_template("profile_edit.html")
-
-
-# --------------------------------------------------------------------------
-# Public share page (no login required)
-# --------------------------------------------------------------------------
 
 
 @app.route("/share/<slug>")
@@ -529,12 +501,6 @@ def shared_plan(slug):
     )
 
 
-# --------------------------------------------------------------------------
-# Guestbook / wishes — visitors on the public share page can leave a short
-# reaction + note without logging in. The plan owner can delete any entry.
-# --------------------------------------------------------------------------
-
-
 def _wish_reaction_summary(plan):
     """Returns [(emoji, count), ...] sorted by count desc, for the little
     reaction tally shown above the guestbook."""
@@ -549,8 +515,6 @@ def _wish_reaction_summary(plan):
 def add_wish(slug):
     plan = Plan.query.filter_by(share_slug=slug).first_or_404()
 
-    # Honeypot: a real visitor never fills this hidden field, so silently
-    # pretend success if it's filled — no error message to tip off a bot.
     if request.form.get("website"):
         return redirect(url_for("shared_plan", slug=slug) + "#wishes")
 
